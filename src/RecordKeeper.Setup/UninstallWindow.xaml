@@ -1,0 +1,57 @@
+﻿<Window x:Class="RecordKeeper.Setup.UninstallWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:automation="clr-namespace:System.Windows.Automation;assembly=PresentationCore"
+        Title="Remove acvayrecords"
+        Width="660" Height="430"
+        MinWidth="560" MinHeight="380"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource Page}"
+        FontSize="15">
+
+    <DockPanel Margin="26">
+
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,18">
+            <TextBlock Text="Remove acvayrecords" FontSize="24" FontWeight="SemiBold"
+                       Foreground="{StaticResource Heading}"
+                       automation:AutomationProperties.HeadingLevel="Level1" />
+            <Border Height="4" Width="92" CornerRadius="2" HorizontalAlignment="Left"
+                    Background="{StaticResource Cyan}" Margin="0,12,0,0" />
+        </StackPanel>
+
+        <Border DockPanel.Dock="Bottom" BorderBrush="{StaticResource Line}"
+                BorderThickness="0,1,0,0" Margin="0,18,0,0" Padding="0,16,0,0">
+            <DockPanel LastChildFill="False">
+                <TextBlock x:Name="StatusText" DockPanel.Dock="Left" VerticalAlignment="Center"
+                           Foreground="{StaticResource Subtle}"
+                           automation:AutomationProperties.Name="Status"
+                           automation:AutomationProperties.LiveSetting="Polite" />
+
+                <Button x:Name="CancelButton" Content="_Keep it" DockPanel.Dock="Right"
+                        MinWidth="140" IsCancel="True" IsDefault="True" />
+
+                <Button x:Name="RemoveButton" Content="_Remove" DockPanel.Dock="Right"
+                        Style="{StaticResource PrimaryButton}" MinWidth="160"
+                        Margin="0,0,12,0" />
+            </DockPanel>
+        </Border>
+
+        <StackPanel>
+            <TextBlock Text="This removes the program, its Start menu entry and its desktop shortcut." />
+
+            <Border Background="{StaticResource Panel}" CornerRadius="8" Padding="16" Margin="0,16,0,0">
+                <StackPanel>
+                    <TextBlock Text="Your records are not removed." FontWeight="SemiBold"
+                               Foreground="{StaticResource Heading}" />
+                    <TextBlock x:Name="RecordsLine" Margin="0,6,0,0"
+                               Foreground="{StaticResource Ink}" />
+                    <TextBlock Margin="0,6,0,0" Foreground="{StaticResource Subtle}"
+                               Text="They stay exactly where they are, with the attachments, the backups and the exports. Delete that folder yourself if you want them gone." />
+                </StackPanel>
+            </Border>
+
+            <TextBlock x:Name="ResultText" Margin="0,18,0,0" Visibility="Collapsed"
+                       automation:AutomationProperties.LiveSetting="Assertive" />
+        </StackPanel>
+    </DockPanel>
+</Window>

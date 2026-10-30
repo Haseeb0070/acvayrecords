@@ -1,0 +1,72 @@
+﻿<Window x:Class="RecordKeeper.App.Views.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:automation="clr-namespace:System.Windows.Automation;assembly=PresentationCore"
+        Title="About acvayrecords"
+        Width="660" Height="560"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontSize="{DynamicResource App.FontSize}"
+        Background="{DynamicResource App.Background}"
+        Foreground="{DynamicResource App.Foreground}">
+
+    <DockPanel Margin="20">
+
+        <!-- The brand lock-up: mark beside wordmark. -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,18">
+            <Image Source="{StaticResource Brand.LogoMark}"
+                   Width="72" Height="72"
+                   VerticalAlignment="Center"
+                   automation:AutomationProperties.Name="acvaysoft logo" />
+
+            <StackPanel Margin="18,0,0,0" VerticalAlignment="Center">
+                <TextBlock FontSize="34" TextWrapping="NoWrap"
+                           automation:AutomationProperties.Name="acvaysoft"
+                           automation:AutomationProperties.HeadingLevel="Level1"><!--
+                    No whitespace between these tags, or it reads "acvay soft".
+                --><Run Text="acvay" FontWeight="Bold" Foreground="{StaticResource Brand.DeepBlue}" /><Run Text="soft" FontWeight="Light" Foreground="{StaticResource Brand.MidBlue}" /></TextBlock>
+                <TextBlock x:Name="ProductLine"
+                           FontSize="16"
+                           Foreground="{DynamicResource App.Foreground}"
+                           Margin="0,2,0,0" />
+                <TextBlock x:Name="PoweredByLine"
+                           FontSize="14"
+                           Foreground="{DynamicResource App.SubtleForeground}"
+                           Margin="0,4,0,0" />
+            </StackPanel>
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button x:Name="OpenFolderButton" Content="Open data _folder" MinWidth="190" />
+            <Button x:Name="CloseButton" Content="_Close" IsDefault="True" IsCancel="True" Margin="0" />
+        </StackPanel>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+            <StackPanel Margin="0,0,14,0">
+
+                <TextBlock Text="Everything is stored on this computer only. There is no server, no account, and no internet connection at any point."
+                           Style="{StaticResource InfoText}"
+                           Margin="0,0,0,16" />
+
+                <TextBlock Text="Your data folder" Style="{StaticResource HeadingText}"
+                           automation:AutomationProperties.HeadingLevel="Level2" />
+                <TextBox x:Name="DataFolderBox"
+                         IsReadOnly="True"
+                         Margin="0,0,0,8"
+                         automation:AutomationProperties.Name="Your data folder"
+                         automation:AutomationProperties.HelpText="Read only. This one folder holds the database, your attached files, the backups and the exports." />
+                <TextBlock Text="That one folder holds the database, your attached files, the backups and the exports. Copy it to move everything to another computer."
+                           Style="{StaticResource SubtleText}"
+                           Margin="0,0,0,16" />
+
+                <TextBlock Text="Getting around" Style="{StaticResource HeadingText}"
+                           automation:AutomationProperties.HeadingLevel="Level2" />
+                <TextBlock Style="{StaticResource SubtleText}">
+                    Press F1 at any time for every keyboard shortcut, or Control plus K to search for a command by name.
+                </TextBlock>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

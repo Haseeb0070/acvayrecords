@@ -1,0 +1,66 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Dark theme: a black page, with white, yellow and light blue carrying the text.
+
+        The three text colours each have a job, so colour reinforces the structure
+        instead of just decorating it:
+          white       the data itself, and body text
+          yellow      headings, and anything the eye should land on first
+          light blue  labels, counts and explanatory text around the data
+
+        Every pair below clears WCAG AA (4.5 to 1) against the background it sits on,
+        and most clear AAA (7 to 1). The contrast check in the test suite enforces that,
+        so a later tweak to one of these cannot quietly make the app unreadable.
+    -->
+
+    <!-- Page and panels. Panels lift slightly off the black so edges stay visible. -->
+    <SolidColorBrush x:Key="App.Background"          Color="#000000" />
+    <SolidColorBrush x:Key="App.Foreground"          Color="#FFFFFF" />
+    <SolidColorBrush x:Key="App.PanelBackground"     Color="#101418" />
+    <SolidColorBrush x:Key="App.PanelForeground"     Color="#FFFFFF" />
+
+    <!-- Light blue: labels, help text, counts. 13.2 to 1 on black. -->
+    <SolidColorBrush x:Key="App.SubtleForeground"    Color="#8ED6FF" />
+    <SolidColorBrush x:Key="App.InfoForeground"      Color="#8ED6FF" />
+
+    <!-- Yellow: headings and emphasis. 14.9 to 1 on black. -->
+    <SolidColorBrush x:Key="App.HeadingForeground"   Color="#FFD54A" />
+
+    <SolidColorBrush x:Key="App.Border"              Color="#5A6472" />
+
+    <SolidColorBrush x:Key="App.ControlBackground"   Color="#14181E" />
+    <SolidColorBrush x:Key="App.ControlForeground"   Color="#FFFFFF" />
+
+    <!--
+        Selection is a deep blue block with white text. Row text switches to this
+        foreground when its row is selected, so the light blue and yellow used
+        elsewhere never end up sitting on a background they cannot be read against.
+    -->
+    <SolidColorBrush x:Key="App.SelectionBackground" Color="#10456F" />
+    <SolidColorBrush x:Key="App.SelectionForeground" Color="#FFFFFF" />
+
+    <!-- A selected row uses a quieter fill plus a marker bar; see the light theme. -->
+    <SolidColorBrush x:Key="App.RowSelectionBackground" Color="#123B58" />
+    <SolidColorBrush x:Key="App.RowSelectionForeground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="App.RowMarker"              Color="#FFD54A" />
+
+    <SolidColorBrush x:Key="App.AccentBackground"    Color="#FFD54A" />
+    <SolidColorBrush x:Key="App.AccentForeground"    Color="#141000" />
+
+    <!-- The one button on screen that does the main thing. -->
+    <SolidColorBrush x:Key="App.PrimaryButtonBackground" Color="#FFD54A" />
+    <SolidColorBrush x:Key="App.PrimaryButtonForeground" Color="#141000" />
+    <SolidColorBrush x:Key="App.PrimaryButtonBorder"     Color="#FFD54A" />
+
+    <SolidColorBrush x:Key="App.ErrorForeground"     Color="#FFA3A3" />
+
+    <!-- A quiet annotation, not an error; see the light theme. -->
+    <SolidColorBrush x:Key="App.RequiredForeground"  Color="#AEBCC9" />
+    <SolidColorBrush x:Key="App.SuccessForeground"   Color="#8EE6B4" />
+
+    <SolidColorBrush x:Key="App.ScrollTrack"         Color="#101418" />
+    <SolidColorBrush x:Key="App.ScrollThumb"         Color="#5A6472" />
+
+</ResourceDictionary>

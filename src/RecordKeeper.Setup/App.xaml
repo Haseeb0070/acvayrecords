@@ -1,0 +1,16 @@
+﻿<Application x:Class="RecordKeeper.Setup.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--
+                    Kept in its own dictionary rather than written out here, so the
+                    windows can be rendered and checked outside the installer.
+                -->
+                <ResourceDictionary Source="Themes/SetupTheme.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+
+    <AssemblyName>acvayrecords-setup</AssemblyName>
+    <RootNamespace>RecordKeeper.Setup</RootNamespace>
+    <Product>acvayrecords setup</Product>
+    <AssemblyTitle>acvayrecords setup</AssemblyTitle>
+    <Company>acvaysoft</Company>
+    <Authors>Haseeb</Authors>
+    <Copyright>Powered by Haseeb</Copyright>
+    <Version>1.0.0</Version>
+
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationIcon>..\RecordKeeper.App\Branding\acvayrecords.ico</ApplicationIcon>
+
+    <!-- One file to hand someone, on a machine with no .NET installed. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+
+    <!--
+      The installer deliberately references no other project in this solution. It has
+      to keep working when the application it installs cannot even start, so it shares
+      no code with it; the application arrives as the payload below, already built.
+    -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      The application being installed, put here by tools\build-release.cmd. The build
+      works without it so the installer can be compiled and looked at on its own; it
+      then says plainly that it has nothing to install.
+    -->
+    <EmbeddedResource Include="payload\acvayrecords.exe"
+                      Condition="Exists('payload\acvayrecords.exe')"
+                      LogicalName="acvayrecords.exe" />
+
+    <EmbeddedResource Include="..\RecordKeeper.App\Branding\acvayrecords.ico"
+                      LogicalName="acvayrecords.ico" />
+  </ItemGroup>
+
+</Project>

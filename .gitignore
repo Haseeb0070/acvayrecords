@@ -1,0 +1,43 @@
+# Build output
+bin/
+obj/
+
+# Published output. Both are rebuilt by tools\build-release.cmd, and the installer
+# alone is 140 MB, which has no business in a repository.
+dist/
+release/
+
+# The application, copied in so the installer can carry it. A build artefact.
+src/RecordKeeper.Setup/payload/
+
+# Visual Studio and Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+*.DotSettings.user
+
+# Debugging symbols and crash dumps
+*.pdb
+*.mdb
+*.dmp
+
+# Signing material. A certificate and its password must never be committed:
+# anyone holding both can sign anything in your name.
+*.pfx
+*.p12
+*.snk
+
+# Local data. Records, settings and logs belong on the machine, not in the history.
+*.db
+*.db-wal
+*.db-shm
+*.db.previous
+*.db.before-*
+settings.json
+
+# Windows and macOS clutter
+Thumbs.db
+desktop.ini
+.DS_Store

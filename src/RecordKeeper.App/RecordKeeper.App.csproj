@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+
+    <AssemblyName>acvayrecords</AssemblyName>
+    <RootNamespace>RecordKeeper.App</RootNamespace>
+    <Product>acvayrecords</Product>
+    <AssemblyTitle>acvayrecords</AssemblyTitle>
+    <Company>acvaysoft</Company>
+    <Authors>Haseeb</Authors>
+    <Copyright>Powered by Haseeb</Copyright>
+    <Version>1.0.0</Version>
+
+    <!-- Built from the same vector logo the window draws, at ten sizes. -->
+    <ApplicationIcon>Branding\acvayrecords.ico</ApplicationIcon>
+
+    <!-- PerMonitorV2 keeps text crisp under Windows Magnifier and on mixed-DPI setups. -->
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+
+    <!-- A single self-contained .exe: no runtime to install, no database server. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RecordKeeper.Core\RecordKeeper.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Used for the optional spoken confirmations that work independently of Narrator. -->
+    <PackageReference Include="System.Speech" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>

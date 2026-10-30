@@ -1,0 +1,75 @@
+﻿<Window x:Class="RecordKeeper.App.Views.CommandPaletteWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:automation="clr-namespace:System.Windows.Automation;assembly=PresentationCore"
+        Title="Find a command"
+        Width="760" SizeToContent="Manual" Height="560"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontSize="{DynamicResource App.FontSize}"
+        Background="{DynamicResource App.Background}"
+        Foreground="{DynamicResource App.Foreground}">
+
+    <Window.Resources>
+        <Style x:Key="PaletteItemStyle" TargetType="ListBoxItem"
+               BasedOn="{StaticResource {x:Type ListBoxItem}}">
+            <Setter Property="automation:AutomationProperties.Name" Value="{Binding AccessibleName}" />
+        </Style>
+    </Window.Resources>
+
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+            <TextBlock Text="Find a command"
+                       Style="{StaticResource PageHeading}"
+                       automation:AutomationProperties.HeadingLevel="Level1" />
+            <Border Style="{StaticResource Brand.AccentRule}" />
+            <TextBlock Text="Type part of a command name. Press the down arrow to reach the results, Enter to run one, Escape to close."
+                       Style="{StaticResource InfoText}"
+                       Margin="0,12,0,12" />
+
+            <Label Target="{Binding ElementName=QueryBox}" Content="_Command" />
+            <TextBox x:Name="QueryBox"
+                     automation:AutomationProperties.Name="Command search"
+                     automation:AutomationProperties.HelpText="Type part of a command name. Results update as you type." />
+
+            <TextBlock x:Name="ResultCountText"
+                       Foreground="{DynamicResource App.SubtleForeground}"
+                       Margin="0,8,0,0"
+                       automation:AutomationProperties.LiveSetting="Polite" />
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button x:Name="RunButton" Content="_Run" IsDefault="True" />
+            <Button x:Name="CloseButton" Content="_Close" IsCancel="True" Margin="0" />
+        </StackPanel>
+
+        <ListBox x:Name="ResultList"
+                 ItemContainerStyle="{StaticResource PaletteItemStyle}"
+                 automation:AutomationProperties.Name="Matching commands"
+                 automation:AutomationProperties.HelpText="Use the up and down arrow keys, then press Enter to run the command.">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{Binding Name}" Style="{StaticResource RowPrimaryText}" />
+                            <TextBlock Text="{Binding Description}"
+                                       Style="{StaticResource RowSecondaryText}"
+                                       Margin="0,3,0,0" />
+                        </StackPanel>
+
+                        <TextBlock Grid.Column="1" Text="{Binding Shortcut}"
+                                   Style="{StaticResource RowAccentText}"
+                                   Margin="16,0,0,0"
+                                   VerticalAlignment="Center" />
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</Window>

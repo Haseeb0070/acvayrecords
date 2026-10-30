@@ -1,0 +1,226 @@
+﻿<Window x:Class="RecordKeeper.App.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:automation="clr-namespace:System.Windows.Automation;assembly=PresentationCore"
+        Title="Settings"
+        Width="860" Height="760"
+        MinWidth="700" MinHeight="540"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontSize="{DynamicResource App.FontSize}"
+        Background="{DynamicResource App.Background}"
+        Foreground="{DynamicResource App.Foreground}">
+
+    <DockPanel Margin="16">
+
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+            <TextBlock Text="Settings"
+                       Style="{StaticResource PageHeading}"
+                       automation:AutomationProperties.HeadingLevel="Level1" />
+            <Border Style="{StaticResource Brand.AccentRule}" />
+            <TextBlock Text="Changes to the text size, colours and focus outline take effect straight away so you can judge them. Cancel puts everything back."
+                       Style="{StaticResource InfoText}"
+                       Margin="0,12,0,0" />
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button x:Name="OkButton" Content="_Save settings" IsDefault="True" MinWidth="160" />
+            <Button x:Name="CancelButton" Content="_Cancel" IsCancel="True" Margin="0" />
+        </StackPanel>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+            <StackPanel Margin="0,0,16,0">
+
+                <!-- ============ Reading ============ -->
+                <GroupBox Header="Reading">
+                    <StackPanel>
+                        <Label Target="{Binding ElementName=FontSizeSlider}" Content="Text si_ze" />
+                        <Slider x:Name="FontSizeSlider"
+                                Minimum="11" Maximum="48"
+                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                TickPlacement="BottomRight"
+                                SmallChange="1" LargeChange="4"
+                                automation:AutomationProperties.Name="Text size in points"
+                                automation:AutomationProperties.HelpText="Use the left and right arrow keys to change the text size. The whole application resizes as you move it." />
+                        <TextBlock x:Name="FontSizeText"
+                                   Margin="0,6,0,14"
+                                   FontWeight="SemiBold"
+                                   automation:AutomationProperties.LiveSetting="Polite" />
+
+                        <TextBlock Text="Colours" FontWeight="SemiBold" Margin="0,0,0,6" />
+                        <StackPanel automation:AutomationProperties.Name="Colour theme">
+                            <RadioButton x:Name="ThemeSystemRadio" GroupName="Theme"
+                                         Content="Follow Windows, including high contrast"
+                                         Margin="0,0,0,6"
+                                         automation:AutomationProperties.HelpText="Recommended. Picks up the Windows high contrast scheme and the light or dark setting automatically." />
+                            <RadioButton x:Name="ThemeLightRadio" GroupName="Theme"
+                                         Content="Always light" Margin="0,0,0,6" />
+                            <RadioButton x:Name="ThemeDarkRadio" GroupName="Theme"
+                                         Content="Always dark" Margin="0,0,0,6" />
+                            <RadioButton x:Name="ThemeHighContrastRadio" GroupName="Theme"
+                                         Content="Always high contrast" Margin="0,0,0,0" />
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- ============ Focus outline ============ -->
+                <GroupBox Header="The outline around the focused control">
+                    <StackPanel>
+                        <TextBlock Text="This is the box drawn around whatever the keyboard is on. A thicker, brighter outline is easier to find under Magnifier."
+                                   Foreground="{DynamicResource App.SubtleForeground}"
+                                   Margin="0,0,0,10" />
+
+                        <Label Target="{Binding ElementName=FocusThicknessSlider}" Content="Outline _thickness" />
+                        <Slider x:Name="FocusThicknessSlider"
+                                Minimum="1" Maximum="8"
+                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                TickPlacement="BottomRight"
+                                SmallChange="1" LargeChange="2"
+                                automation:AutomationProperties.Name="Focus outline thickness in pixels"
+                                automation:AutomationProperties.HelpText="Use the left and right arrow keys. One is a thin line, eight is very thick." />
+                        <TextBlock x:Name="FocusThicknessText"
+                                   Margin="0,6,0,14" FontWeight="SemiBold"
+                                   automation:AutomationProperties.LiveSetting="Polite" />
+
+                        <Label Target="{Binding ElementName=FocusColorBox}" Content="Outline c_olour" />
+                        <ComboBox x:Name="FocusColorBox"
+                                  automation:AutomationProperties.Name="Focus outline colour"
+                                  automation:AutomationProperties.HelpText="Use the up and down arrow keys. This is ignored in high contrast mode, where Windows chooses the colour." />
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- ============ Sound and speech ============ -->
+                <GroupBox Header="Sound and speech">
+                    <StackPanel>
+                        <CheckBox x:Name="SpeakConfirmationsBox"
+                                  Content="Speak confirmations in the application's own voice"
+                                  Margin="0,0,0,6"
+                                  automation:AutomationProperties.Name="Speak confirmations in the application's own voice"
+                                  automation:AutomationProperties.HelpText="Useful if you do not keep Narrator running. If Narrator is on, leaving this off avoids hearing everything twice." />
+
+                        <CheckBox x:Name="PlaySoundCuesBox"
+                                  Content="Play a short sound on save, on error and on delete"
+                                  automation:AutomationProperties.Name="Play a short sound on save, on error and on delete"
+                                  automation:AutomationProperties.HelpText="Three distinct Windows sounds, so you can tell what happened without waiting for the words." />
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- ============ Startup ============ -->
+                <GroupBox Header="Starting up">
+                    <StackPanel>
+                        <CheckBox x:Name="ShowStartupLogoBox"
+                                  Content="Show the acvaysoft logo while the application starts"
+                                  automation:AutomationProperties.Name="Show the acvaysoft logo while the application starts"
+                                  automation:AutomationProperties.HelpText="A short animation before the window appears. Any key or click skips it. It is left out automatically when a screen reader is running, and shown without movement when Windows has animations turned off." />
+
+                        <TextBlock Text="Any key or click skips it. It is left out automatically when a screen reader is running, and shown without movement when Windows has animations turned off."
+                                   Foreground="{DynamicResource App.SubtleForeground}"
+                                   Margin="0,8,0,0" />
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- ============ The record list ============ -->
+                <GroupBox Header="How the record list opens">
+                    <StackPanel automation:AutomationProperties.Name="How the record list opens">
+                        <RadioButton x:Name="ViewFormRadio" GroupName="ViewMode"
+                                     Content="List view, one record per line"
+                                     Margin="0,0,0,6"
+                                     automation:AutomationProperties.HelpText="Recommended with a screen reader. Each record is a single item read out as one sentence." />
+                        <RadioButton x:Name="ViewTableRadio" GroupName="ViewMode"
+                                     Content="Table view, fields in columns"
+                                     automation:AutomationProperties.HelpText="Better for comparing many records by eye. Needs cell-by-cell navigation with a screen reader." />
+
+                        <CheckBox x:Name="WarnDuplicatesBox"
+                                  Content="Warn me when a record title already exists"
+                                  Margin="0,14,0,0"
+                                  automation:AutomationProperties.Name="Warn me when a record title already exists" />
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- ============ Money ============ -->
+                <GroupBox Header="Money">
+                    <StackPanel>
+                        <Label Target="{Binding ElementName=CurrencyBox}" Content="Amounts are in _rupees" />
+                        <!--
+                            Full width, like the other lists here. Capping the width and
+                            aligning left makes the control shrink to its text, and the
+                            chevron then sits on top of the last word.
+                        -->
+                        <ComboBox x:Name="CurrencyBox"
+                                  DisplayMemberPath="Label"
+                                  automation:AutomationProperties.Name="Currency"
+                                  automation:AutomationProperties.HelpText="How every money field, and every total, is written and read aloud. This is not taken from the Windows regional settings, so your amounts stay in the same currency wherever the application is run." />
+
+                        <TextBlock x:Name="CurrencyExampleText"
+                                   Foreground="{DynamicResource App.SubtleForeground}"
+                                   Margin="0,12,0,0" />
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- ============ Backups ============ -->
+                <GroupBox Header="Backups">
+                    <StackPanel>
+                        <CheckBox x:Name="AutoBackupBox"
+                                  Content="Make a backup once a day, the first time the application opens"
+                                  Margin="0,0,0,12"
+                                  automation:AutomationProperties.Name="Make a backup once a day"
+                                  automation:AutomationProperties.HelpText="Writes a dated zip of the database and all attached files into the backups folder." />
+
+                        <Label Target="{Binding ElementName=BackupsToKeepBox}" Content="Daily backups to _keep" />
+                        <TextBox x:Name="BackupsToKeepBox" MaxWidth="140" HorizontalAlignment="Left"
+                                 automation:AutomationProperties.Name="Number of daily backups to keep"
+                                 automation:AutomationProperties.HelpText="Older automatic backups beyond this number are deleted. Backups you make yourself are never deleted." />
+
+                        <TextBlock x:Name="BackupInfoText"
+                                   Foreground="{DynamicResource App.SubtleForeground}"
+                                   Margin="0,12,0,0" />
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- ============ Encryption ============ -->
+                <GroupBox Header="Encryption">
+                    <StackPanel>
+                        <TextBlock x:Name="EncryptionStatusText"
+                                   FontWeight="SemiBold"
+                                   Margin="0,0,0,8"
+                                   automation:AutomationProperties.LiveSetting="Polite" />
+
+                        <TextBlock Text="Encryption scrambles the database file so it cannot be read without the password. It is off unless you turn it on."
+                                   Style="{StaticResource FieldHelpText}"
+                                   Margin="0,0,0,12" />
+
+                        <Button x:Name="EncryptionButton"
+                                HorizontalAlignment="Left"
+                                MinWidth="230"
+                                Margin="0,0,0,12" />
+
+                        <TextBlock Style="{StaticResource FieldHelpText}">
+                            Two things worth knowing. A forgotten password cannot be recovered by anyone, including this application. And only the database is encrypted: files you have attached stay readable in the attachments folder.
+                        </TextBlock>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- ============ Where everything is stored ============ -->
+                <GroupBox Header="Where everything is stored">
+                    <StackPanel>
+                        <TextBlock Text="One folder holds the database, your attached files, the backups and the exports. Copying it is how you move everything to another computer."
+                                   Foreground="{DynamicResource App.SubtleForeground}"
+                                   Margin="0,0,0,10" />
+
+                        <Label Target="{Binding ElementName=DataFolderBox}" Content="Data _folder" />
+                        <TextBox x:Name="DataFolderBox" IsReadOnly="True" Margin="0,0,0,10"
+                                 automation:AutomationProperties.Name="Data folder"
+                                 automation:AutomationProperties.HelpText="Read only. Use the buttons below to open it or move it." />
+
+                        <StackPanel Orientation="Horizontal">
+                            <Button x:Name="OpenFolderButton" Content="Op_en this folder" MinWidth="180" />
+                            <Button x:Name="MoveFolderButton" Content="_Move the data folder" MinWidth="200" Margin="0" />
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

@@ -1,0 +1,120 @@
+﻿<Window x:Class="RecordKeeper.App.Views.FieldEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:automation="clr-namespace:System.Windows.Automation;assembly=PresentationCore"
+        Title="Field"
+        Width="680" Height="700"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontSize="{DynamicResource App.FontSize}"
+        Background="{DynamicResource App.Background}"
+        Foreground="{DynamicResource App.Foreground}">
+
+    <DockPanel Margin="16">
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+            <TextBlock x:Name="HeadingText"
+                       Style="{StaticResource PageHeading}"
+                       automation:AutomationProperties.HeadingLevel="Level1" />
+            <Border Style="{StaticResource Brand.AccentRule}" />
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button x:Name="OkButton" Content="_Save field" IsDefault="True" MinWidth="140" />
+            <Button x:Name="CancelButton" Content="_Cancel" IsCancel="True" Margin="0" />
+        </StackPanel>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+            <StackPanel Margin="0,0,16,0">
+
+                <Label Target="{Binding ElementName=NameBox}" Content="Field _name" />
+                <TextBox x:Name="NameBox" Margin="0,0,0,16"
+                         automation:AutomationProperties.Name="Field name, required"
+                         automation:AutomationProperties.HelpText="What this field is called, for example Amount or Phone number." />
+
+                <Label Target="{Binding ElementName=TypeBox}" Content="What kind of value it _holds" />
+                <ComboBox x:Name="TypeBox" Margin="0,0,0,4"
+                          automation:AutomationProperties.Name="Kind of value"
+                          automation:AutomationProperties.HelpText="Use the up and down arrow keys to choose. This decides how the value is checked and shown." />
+                <TextBlock x:Name="TypeHintText"
+                           Foreground="{DynamicResource App.SubtleForeground}"
+                           Margin="0,0,0,16" />
+
+                <StackPanel x:Name="FormulaPanel">
+                    <Label Target="{Binding ElementName=FormulaBox}" Content="_Work this field out from the others" />
+                    <TextBox x:Name="FormulaBox" Margin="0,0,0,4"
+                             automation:AutomationProperties.Name="Formula"
+                             automation:AutomationProperties.HelpText="Leave empty for a field you type yourself. To have it worked out, put other field names in square brackets, for example: [Quantity] times [Price per piece]. You can use plus, minus, times, divide and brackets." />
+                    <TextBlock x:Name="FormulaHintText"
+                               Foreground="{DynamicResource App.SubtleForeground}"
+                               Margin="0,0,0,16" />
+                </StackPanel>
+
+                <StackPanel x:Name="TotalPanel">
+                    <CheckBox x:Name="TotalInListBox"
+                              Content="Add this field up under the record list"
+                              Margin="0,0,0,4"
+                              automation:AutomationProperties.Name="Add this field up under the record list"
+                              automation:AutomationProperties.HelpText="Shows a running total of this field above the records. Worth ticking for a total price or an amount owed; not for a price per piece, where a sum of the prices means very little." />
+                    <TextBlock x:Name="TotalHintText"
+                               Style="{StaticResource FieldHelpText}"
+                               Margin="0,0,0,16" />
+                </StackPanel>
+
+                <StackPanel x:Name="ExpensePanel">
+                    <CheckBox x:Name="IsExpenseBox"
+                              Content="Count this towards the group expense total"
+                              Margin="0,0,0,4"
+                              automation:AutomationProperties.Name="Count this towards the group expense total"
+                              automation:AutomationProperties.HelpText="Every field ticked this way, in any category of the same group, is added up into one grand total shown against the group." />
+                    <TextBlock x:Name="ExpenseHintText"
+                               Style="{StaticResource FieldHelpText}"
+                               Margin="0,0,0,16" />
+                </StackPanel>
+
+                <CheckBox x:Name="RequiredBox" Content="This field must be filled in"
+                          Margin="0,0,0,16"
+                          automation:AutomationProperties.Name="This field must be filled in"
+                          automation:AutomationProperties.HelpText="A record cannot be saved while a required field is empty." />
+
+                <CheckBox x:Name="ShowInListBox" Content="Show this field in the record list"
+                          Margin="0,0,0,16"
+                          automation:AutomationProperties.Name="Show this field in the record list"
+                          automation:AutomationProperties.HelpText="When on, this field appears as a column in table view and is read out for each record in list view." />
+
+                <StackPanel x:Name="ChoicesPanel">
+                    <Label Target="{Binding ElementName=ChoicesBox}" Content="The _options to choose from" />
+                    <TextBox x:Name="ChoicesBox"
+                             AcceptsReturn="True" TextWrapping="Wrap"
+                             MinLines="5" MaxLines="10"
+                             VerticalScrollBarVisibility="Auto"
+                             VerticalContentAlignment="Top"
+                             Margin="0,0,0,16"
+                             automation:AutomationProperties.Name="Options to choose from"
+                             automation:AutomationProperties.HelpText="Type one option on each line. Press Enter to start a new line." />
+                </StackPanel>
+
+                <Label Target="{Binding ElementName=DefaultBox}" Content="_Starting value for a new record" />
+                <TextBox x:Name="DefaultBox" Margin="0,0,0,4"
+                         automation:AutomationProperties.Name="Starting value for a new record"
+                         automation:AutomationProperties.HelpText="Leave empty for no starting value. In a date field you can type the word today." />
+                <TextBlock Text="Leave this empty for no starting value. In a date field, the word today fills in the current date."
+                           Foreground="{DynamicResource App.SubtleForeground}"
+                           Margin="0,0,0,16" />
+
+                <Label Target="{Binding ElementName=HelpBox}" Content="_Explanation read out with the field" />
+                <TextBox x:Name="HelpBox"
+                         AcceptsReturn="True" TextWrapping="Wrap"
+                         MinLines="3" MaxLines="6"
+                         VerticalScrollBarVisibility="Auto"
+                         VerticalContentAlignment="Top"
+                         Margin="0,0,0,4"
+                         automation:AutomationProperties.Name="Explanation read out with the field"
+                         automation:AutomationProperties.HelpText="This sentence is shown under the field and read out by the screen reader. Use it to say what belongs here." />
+                <TextBlock Text="This is shown under the field and read out by the screen reader, so it is worth filling in."
+                           Foreground="{DynamicResource App.SubtleForeground}" />
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

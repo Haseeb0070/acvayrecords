@@ -1,0 +1,135 @@
+﻿<Window x:Class="RecordKeeper.Setup.SetupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:automation="clr-namespace:System.Windows.Automation;assembly=PresentationCore"
+        Title="Install acvayrecords"
+        Width="780" Height="800"
+        MinWidth="660" MinHeight="620"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource Page}"
+        FontSize="15">
+
+    <DockPanel Margin="26">
+
+        <!-- The brand, so it is clear what is being installed. -->
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,18">
+            <StackPanel Orientation="Horizontal">
+                <Image x:Name="Mark" Width="56" Height="56" VerticalAlignment="Center"
+                       automation:AutomationProperties.Name="acvaysoft logo" />
+
+                <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                    <TextBlock FontSize="30" TextWrapping="NoWrap"
+                               automation:AutomationProperties.Name="acvayrecords"
+                               automation:AutomationProperties.HeadingLevel="Level1"><Run
+                            Text="acvay" FontWeight="Bold" Foreground="{StaticResource Heading}" /><Run
+                            Text="records" FontWeight="Light" Foreground="{StaticResource Label}" /></TextBlock>
+
+                    <TextBlock Text="Powered by Haseeb" FontSize="13"
+                               Foreground="{StaticResource Subtle}" Margin="0,2,0,0" />
+                </StackPanel>
+            </StackPanel>
+
+            <Border Height="4" Width="92" CornerRadius="2" HorizontalAlignment="Left"
+                    Background="{StaticResource Cyan}" Margin="0,16,0,0" />
+
+            <TextBlock Margin="0,16,0,0" Foreground="{StaticResource Subtle}"
+                       Text="Everything is kept on this computer. There is no account to make, no server, and no internet connection at any point." />
+        </StackPanel>
+
+        <!-- The buttons stay put at the bottom, whatever the page is showing. -->
+        <Border DockPanel.Dock="Bottom" BorderBrush="{StaticResource Line}"
+                BorderThickness="0,1,0,0" Margin="0,18,0,0" Padding="0,16,0,0">
+            <DockPanel LastChildFill="False">
+                <TextBlock x:Name="StatusText" DockPanel.Dock="Left"
+                           VerticalAlignment="Center"
+                           MaxWidth="360"
+                           Foreground="{StaticResource Subtle}"
+                           automation:AutomationProperties.Name="Status"
+                           automation:AutomationProperties.LiveSetting="Polite" />
+
+                <Button x:Name="CloseButton" Content="_Close" DockPanel.Dock="Right"
+                        MinWidth="120" IsCancel="True" Visibility="Collapsed" />
+
+                <Button x:Name="CancelButton" Content="Cance_l" DockPanel.Dock="Right"
+                        MinWidth="120" IsCancel="True" />
+
+                <Button x:Name="OpenButton" Content="_Open acvayrecords" DockPanel.Dock="Right"
+                        Style="{StaticResource PrimaryButton}" MinWidth="200"
+                        Margin="0,0,12,0" Visibility="Collapsed" />
+
+                <Button x:Name="InstallButton" Content="_Install" DockPanel.Dock="Right"
+                        Style="{StaticResource PrimaryButton}" MinWidth="160"
+                        Margin="0,0,12,0" IsDefault="True" />
+            </DockPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+            <StackPanel x:Name="Questions" Margin="0,0,12,0">
+
+                <!-- Where the records go. First, because it is the one that matters. -->
+                <Label Target="{Binding ElementName=RecordsBox}"
+                       Content="_Where should your records be kept?" />
+
+                <TextBlock Margin="0,0,0,8" Foreground="{StaticResource Subtle}"
+                           Text="This one folder holds the database, the files you attach, the backups and the exports. Put it somewhere that gets backed up, or on a drive of its own. You can move it later in Settings." />
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox x:Name="RecordsBox" Grid.Column="0"
+                             automation:AutomationProperties.Name="Folder for your records"
+                             automation:AutomationProperties.HelpText="Type a folder, or press Choose to pick one. It is made for you if it does not exist yet." />
+
+                    <Button x:Name="BrowseRecordsButton" Grid.Column="1" Content="C_hoose…"
+                            MinWidth="130" Margin="12,0,0,0"
+                            automation:AutomationProperties.Name="Choose the folder for your records" />
+                </Grid>
+
+                <TextBlock x:Name="RecordsNote" Margin="0,8,0,0"
+                           Foreground="{StaticResource Subtle}" />
+
+                <!-- Where the program goes. -->
+                <Label Target="{Binding ElementName=ProgramBox}"
+                       Content="Where should the _program be installed?"
+                       Margin="0,26,0,0" />
+
+                <TextBlock Margin="0,0,0,8" Foreground="{StaticResource Subtle}"
+                           Text="The program itself, which is about 80 megabytes. The suggested folder is your own, so this needs no administrator password." />
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox x:Name="ProgramBox" Grid.Column="0"
+                             automation:AutomationProperties.Name="Folder for the program"
+                             automation:AutomationProperties.HelpText="Type a folder, or press Choose to pick one." />
+
+                    <Button x:Name="BrowseProgramButton" Grid.Column="1" Content="C_hoose…"
+                            MinWidth="130" Margin="12,0,0,0"
+                            automation:AutomationProperties.Name="Choose the folder for the program" />
+                </Grid>
+
+                <!-- Shortcuts. -->
+                <Label Content="Shortcuts" Margin="0,26,0,0" />
+
+                <CheckBox x:Name="StartMenuBox" IsChecked="True"
+                          Content="Add it to the Start menu"
+                          automation:AutomationProperties.Name="Add it to the Start menu" />
+
+                <CheckBox x:Name="DesktopBox" IsChecked="True" Margin="0,8,0,0"
+                          Content="Put a shortcut on the desktop"
+                          automation:AutomationProperties.Name="Put a shortcut on the desktop" />
+
+                <!-- Filled in while installing, and when it is done. -->
+                <TextBlock x:Name="ResultText" Margin="0,24,0,0" Visibility="Collapsed"
+                           automation:AutomationProperties.LiveSetting="Assertive" />
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

@@ -1,0 +1,91 @@
+﻿<Window x:Class="RecordKeeper.App.Views.SplashWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:automation="clr-namespace:System.Windows.Automation;assembly=PresentationCore"
+        Title="acvayrecords"
+        Width="560" Height="320"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterScreen"
+        Topmost="True"
+        Background="Transparent"
+        AllowsTransparency="True"
+        automation:AutomationProperties.Name="acvayrecords is starting. Press any key to continue.">
+
+    <!--
+        The startup screen. Deliberately brief, and skippable with any key or click.
+
+        It is also skipped outright when a screen reader is running or when Windows has
+        animations turned off, because to those users it is nothing but a delay between
+        them and their records.
+    -->
+    <Border x:Name="RootPanel"
+            CornerRadius="16"
+            Background="{DynamicResource App.Background}"
+            BorderBrush="{StaticResource Brand.DeepBlue}"
+            BorderThickness="2">
+
+        <Grid Margin="44,40,44,32">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- The mark. -->
+            <Image x:Name="Mark"
+                   Grid.Row="0"
+                   Source="{StaticResource Brand.LogoMark}"
+                   Width="96" Height="96"
+                   HorizontalAlignment="Left"
+                   Opacity="0"
+                   RenderTransformOrigin="0.5,0.5">
+                <Image.RenderTransform>
+                    <ScaleTransform x:Name="MarkScale" ScaleX="0.82" ScaleY="0.82" />
+                </Image.RenderTransform>
+            </Image>
+
+            <!-- The wordmark. -->
+            <TextBlock x:Name="Wordmark"
+                       Grid.Row="1"
+                       Margin="0,22,0,0"
+                       FontSize="46"
+                       TextWrapping="NoWrap"
+                       Opacity="0">
+                <TextBlock.RenderTransform>
+                    <TranslateTransform x:Name="WordmarkShift" Y="14" />
+                </TextBlock.RenderTransform>
+                <!-- No whitespace between these tags, or it reads "acvay soft". --><Run Text="acvay" FontWeight="Bold" Foreground="{StaticResource Brand.DeepBlue}" /><Run Text="soft" FontWeight="Light" Foreground="{StaticResource Brand.MidBlue}" /></TextBlock>
+
+            <TextBlock x:Name="ProductName"
+                       Grid.Row="2"
+                       Margin="0,6,0,0"
+                       FontSize="18"
+                       Text="acvayrecords"
+                       Foreground="{DynamicResource App.Foreground}"
+                       Opacity="0" />
+
+            <!-- The developer's credit, under the product name. -->
+            <TextBlock x:Name="PoweredBy"
+                       Grid.Row="3"
+                       Margin="0,6,0,0"
+                       VerticalAlignment="Top"
+                       FontSize="13"
+                       Text="Powered by Haseeb"
+                       Foreground="{DynamicResource App.SubtleForeground}"
+                       Opacity="0" />
+
+            <!-- A line that draws itself across, instead of a spinner. -->
+            <Border x:Name="AccentLine"
+                    Grid.Row="4"
+                    Height="5"
+                    Width="0"
+                    CornerRadius="3"
+                    HorizontalAlignment="Left"
+                    Background="{StaticResource Brand.Cyan}" />
+        </Grid>
+    </Border>
+</Window>

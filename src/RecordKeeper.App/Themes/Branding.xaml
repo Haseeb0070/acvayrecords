@@ -1,0 +1,110 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        The acvaysoft mark, defined once as vector geometry on a 100 by 100 canvas.
+
+        Vector rather than a bitmap for two reasons: it stays sharp at any size under
+        Windows Magnifier, and the same definition is rendered straight to a PNG for
+        the top of every PDF, so the printed logo can never drift out of step with the
+        one on screen.
+
+        The mark is a geometric lower-case "a": a deep blue tile, the bowl drawn as a
+        cyan ring, and the stem as a white bar. It stays legible down to about 16 pixels,
+        which is what a window icon needs.
+
+        These colours are fixed on purpose. A logo that repaints itself with the theme
+        is not a logo.
+    -->
+
+    <SolidColorBrush x:Key="Brand.DeepBlue" Color="#00507A" />
+    <SolidColorBrush x:Key="Brand.MidBlue"  Color="#00648F" />
+    <SolidColorBrush x:Key="Brand.Cyan"     Color="#00A9E0" />
+    <SolidColorBrush x:Key="Brand.OnDark"   Color="#FFFFFF" />
+
+    <DrawingImage x:Key="Brand.LogoMark">
+        <DrawingImage.Drawing>
+            <DrawingGroup>
+
+                <!-- The tile. -->
+                <GeometryDrawing Brush="#00507A">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,100,100" RadiusX="24" RadiusY="24" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+
+                <!--
+                    The bowl of the "a". The stem below overlaps its right-hand side by
+                    about six units: they have to actually join, or the mark reads as a
+                    circle next to a bar rather than as a letter.
+                -->
+                <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                        <Pen Brush="#FFFFFF" Thickness="10.5" />
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                        <EllipseGeometry Center="47,42" RadiusX="16.5" RadiusY="16.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+
+                <!--
+                    The stem, drawn over the bowl so the join is solid. Its top is level
+                    with the top of the bowl, never above it: a stem that rises higher
+                    turns the letter into a "d".
+                -->
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="63,20,11,44" RadiusX="5.5" RadiusY="5.5" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+
+                <!-- A cyan bar under the letter, carrying the brand colour. -->
+                <GeometryDrawing Brush="#00A9E0">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="26,72,48,8" RadiusX="4" RadiusY="4" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+
+            </DrawingGroup>
+        </DrawingImage.Drawing>
+    </DrawingImage>
+
+    <!--
+        The short cyan rule that sits under a heading.
+
+        The same mark appears on the startup screen as the line that draws itself
+        across, and on every PDF as the rule under the letterhead. Repeating one small
+        shape in all three places is most of what makes separate screens feel like one
+        product.
+    -->
+    <Style x:Key="Brand.AccentRule" TargetType="Border">
+        <Setter Property="Height" Value="4" />
+        <Setter Property="Width" Value="56" />
+        <Setter Property="CornerRadius" Value="2" />
+        <Setter Property="Background" Value="{DynamicResource Brand.Cyan}" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="Margin" Value="0,10,0,0" />
+    </Style>
+
+    <!-- The strip across the top of a window: mark, wordmark, product name. -->
+    <Style x:Key="Brand.HeaderBar" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource App.PanelBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Brand.Cyan}" />
+        <Setter Property="BorderThickness" Value="0,0,0,3" />
+        <Setter Property="Padding" Value="18,11" />
+    </Style>
+
+    <!--
+        The wordmark: "acvay" heavy in deep blue, "soft" light in mid blue. Both halves
+        clear WCAG AA on white; the brand cyan is never used for the lettering because
+        it only reaches 2.7 to 1 and would be unreadable.
+
+        Exposed as a template so the startup screen and the About box draw the same thing.
+    -->
+    <DataTemplate x:Key="Brand.Wordmark">
+        <TextBlock TextWrapping="NoWrap"><!--
+            No whitespace between these tags, or it reads "acvay soft".
+        --><Run Text="acvay" FontWeight="Bold" Foreground="#00507A" /><Run Text="soft" FontWeight="Light" Foreground="#00648F" /></TextBlock>
+    </DataTemplate>
+
+</ResourceDictionary>

@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{FA015D5C-4D64-4C57-9E31-1DA24A570A13}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecordKeeper.Core", "src\RecordKeeper.Core\RecordKeeper.Core.csproj", "{D9A09781-5535-4877-97F0-BD9B9C2EFF7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecordKeeper.App", "src\RecordKeeper.App\RecordKeeper.App.csproj", "{EEB962DD-515D-41D9-A39D-D5AD078F6B59}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{6D24BD94-1157-4E0C-B1EA-A85A85710EC8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ThemeContrastCheck", "tools\ThemeContrastCheck\ThemeContrastCheck.csproj", "{51BADFC0-64F9-4928-AF6B-2B52EE0E713B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RecordKeeper.Setup", "src\RecordKeeper.Setup\RecordKeeper.Setup.csproj", "{6A65A357-99F8-42E6-9B7C-22A1F65A5611}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D9A09781-5535-4877-97F0-BD9B9C2EFF7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9A09781-5535-4877-97F0-BD9B9C2EFF7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9A09781-5535-4877-97F0-BD9B9C2EFF7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9A09781-5535-4877-97F0-BD9B9C2EFF7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEB962DD-515D-41D9-A39D-D5AD078F6B59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEB962DD-515D-41D9-A39D-D5AD078F6B59}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEB962DD-515D-41D9-A39D-D5AD078F6B59}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEB962DD-515D-41D9-A39D-D5AD078F6B59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51BADFC0-64F9-4928-AF6B-2B52EE0E713B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51BADFC0-64F9-4928-AF6B-2B52EE0E713B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51BADFC0-64F9-4928-AF6B-2B52EE0E713B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51BADFC0-64F9-4928-AF6B-2B52EE0E713B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A65A357-99F8-42E6-9B7C-22A1F65A5611}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A65A357-99F8-42E6-9B7C-22A1F65A5611}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A65A357-99F8-42E6-9B7C-22A1F65A5611}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A65A357-99F8-42E6-9B7C-22A1F65A5611}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D9A09781-5535-4877-97F0-BD9B9C2EFF7A} = {FA015D5C-4D64-4C57-9E31-1DA24A570A13}
+		{EEB962DD-515D-41D9-A39D-D5AD078F6B59} = {FA015D5C-4D64-4C57-9E31-1DA24A570A13}
+		{51BADFC0-64F9-4928-AF6B-2B52EE0E713B} = {6D24BD94-1157-4E0C-B1EA-A85A85710EC8}
+		{6A65A357-99F8-42E6-9B7C-22A1F65A5611} = {FA015D5C-4D64-4C57-9E31-1DA24A570A13}
+	EndGlobalSection
+EndGlobal

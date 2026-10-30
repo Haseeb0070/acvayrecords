@@ -1,0 +1,87 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Light theme: a white page with a Telenor-style blue palette.
+
+        The brand blue is the bright cyan #00A9E0. It only reaches 2.7 to 1 against
+        white, which is well under the 4.5 to 1 that text needs, so it is used the way
+        Telenor use it themselves: as a fill, a bar or a button, with dark text on top
+        of it. Text that sits directly on the white page uses darker blues from the
+        same family instead.
+
+          #10243A  near-black navy   the data itself, and body text          15.7 : 1
+          #00507A  deep blue         headings, column headers, selection      8.7 : 1
+          #00648F  mid blue          field labels, counts, help text          6.5 : 1
+          #00A9E0  brand cyan        fills, marker bars, the main action      fill only
+          #EAF6FB  pale blue         panels and group headers, so the white
+                                     page still has visible structure
+
+        The contrast check in the test suite enforces every one of these, so a later
+        tweak cannot quietly make the app unreadable.
+    -->
+
+    <SolidColorBrush x:Key="App.Background"          Color="#FFFFFF" />
+    <SolidColorBrush x:Key="App.Foreground"          Color="#10243A" />
+    <SolidColorBrush x:Key="App.PanelBackground"     Color="#EAF6FB" />
+    <SolidColorBrush x:Key="App.PanelForeground"     Color="#10243A" />
+
+    <!-- Mid blue: labels, help text, counts. -->
+    <SolidColorBrush x:Key="App.SubtleForeground"    Color="#00648F" />
+    <SolidColorBrush x:Key="App.InfoForeground"      Color="#00648F" />
+
+    <!-- Deep blue: headings and emphasis. -->
+    <SolidColorBrush x:Key="App.HeadingForeground"   Color="#00507A" />
+
+    <!-- 3.6 to 1 on white, which is what a control boundary needs. -->
+    <SolidColorBrush x:Key="App.Border"              Color="#4C8FB3" />
+
+    <SolidColorBrush x:Key="App.ControlBackground"   Color="#FFFFFF" />
+    <SolidColorBrush x:Key="App.ControlForeground"   Color="#10243A" />
+
+    <!--
+        Selection is a solid deep-blue block with white text. Row text switches to this
+        foreground when its row is selected, so the mid blue used for secondary text
+        never ends up sitting on the blue block.
+    -->
+    <SolidColorBrush x:Key="App.SelectionBackground" Color="#00507A" />
+    <SolidColorBrush x:Key="App.SelectionForeground" Color="#FFFFFF" />
+
+    <!--
+        A selected row in a list uses a pale tint rather than the solid block above.
+        A list is mostly rows, so a heavy fill on every highlighted one turns the page
+        into stripes; the marker bar down the left edge is what makes it unmistakable.
+        The tint is light enough that the blue secondary text stays readable on it.
+    -->
+    <SolidColorBrush x:Key="App.RowSelectionBackground" Color="#D7EAF7" />
+    <SolidColorBrush x:Key="App.RowSelectionForeground" Color="#10243A" />
+    <SolidColorBrush x:Key="App.RowMarker"              Color="#00507A" />
+
+    <!-- The brand cyan, always carrying dark navy text rather than white. -->
+    <SolidColorBrush x:Key="App.AccentBackground"    Color="#00A9E0" />
+    <SolidColorBrush x:Key="App.AccentForeground"    Color="#0A2233" />
+
+    <!--
+        The one button on screen that does the main thing: brand cyan fill, dark navy
+        text, and a deep blue outline. The outline matters — the cyan on its own is
+        2.7 to 1 against white, so without it the edge of the most important control
+        on the screen would be the hardest thing to find.
+    -->
+    <SolidColorBrush x:Key="App.PrimaryButtonBackground" Color="#00A9E0" />
+    <SolidColorBrush x:Key="App.PrimaryButtonForeground" Color="#0A2233" />
+    <SolidColorBrush x:Key="App.PrimaryButtonBorder"     Color="#00507A" />
+
+    <SolidColorBrush x:Key="App.ErrorForeground"     Color="#B3261E" />
+
+    <!--
+        "required" is a quiet annotation, not an error. It used to share the error red,
+        which made an untouched form look like it was already failing. Red is kept for
+        things that have actually gone wrong.
+    -->
+    <SolidColorBrush x:Key="App.RequiredForeground"  Color="#5A6B7D" />
+    <SolidColorBrush x:Key="App.SuccessForeground"   Color="#0F6B45" />
+
+    <SolidColorBrush x:Key="App.ScrollTrack"         Color="#EAF6FB" />
+    <SolidColorBrush x:Key="App.ScrollThumb"         Color="#4C8FB3" />
+
+</ResourceDictionary>

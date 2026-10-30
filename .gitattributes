@@ -1,0 +1,15 @@
+# Normalise line endings in the repository, so a checkout on another machine does
+# not show every file as changed.
+* text=auto
+
+# These are only ever read by Windows tools, which want carriage returns.
+*.cmd  text eol=crlf
+*.bat  text eol=crlf
+*.sln  text eol=crlf
+*.csproj text eol=crlf
+
+# Not text. Never diff or convert these.
+*.ico binary
+*.png binary
+*.pdf binary
+*.exe binary

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>RecordKeeper.Core</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      Microsoft.Data.Sqlite.Core plus the SQLCipher bundle, rather than the plain
+      Microsoft.Data.Sqlite package. The stock package ships e_sqlite3, which has no
+      encryption at all and silently ignores a Password in the connection string.
+      SQLCipher gives whole-file, page-level encryption, so an encrypted database is
+      unreadable without the password rather than merely inconvenient to open.
+    -->
+    <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.10" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher" Version="2.1.10" />
+    <PackageReference Include="QuestPDF" Version="2024.12.3" />
+  </ItemGroup>
+
+</Project>

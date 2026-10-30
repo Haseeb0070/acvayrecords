@@ -1,0 +1,85 @@
+﻿<Window x:Class="RecordKeeper.App.Views.NewCategoryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:automation="clr-namespace:System.Windows.Automation;assembly=PresentationCore"
+        Title="New category"
+        Width="680" Height="700"
+        MinWidth="560" MinHeight="560"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
+        FontSize="{DynamicResource App.FontSize}"
+        Background="{DynamicResource App.Background}"
+        Foreground="{DynamicResource App.Foreground}">
+
+    <DockPanel Margin="20">
+
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,16">
+            <TextBlock Text="New category"
+                       Style="{StaticResource PageHeading}"
+                       automation:AutomationProperties.HeadingLevel="Level1" />
+            <Border Style="{StaticResource Brand.AccentRule}" />
+            <TextBlock Text="A category is a kind of record, such as Invoice or Contact. You give it a name here, then add its fields on the next screen."
+                       Style="{StaticResource InfoText}"
+                       Margin="0,12,0,0" />
+        </StackPanel>
+
+        <Border DockPanel.Dock="Bottom"
+                BorderBrush="{DynamicResource App.Border}"
+                BorderThickness="0,1,0,0"
+                Margin="0,16,0,0"
+                Padding="0,14,0,0">
+            <DockPanel LastChildFill="False">
+                <Button x:Name="CreateButton" Content="C_reate category"
+                        DockPanel.Dock="Left"
+                        Style="{StaticResource PrimaryButton}"
+                        IsDefault="True"
+                        MinWidth="180" />
+                <Button x:Name="CancelButton" Content="_Cancel"
+                        DockPanel.Dock="Left"
+                        IsCancel="True" />
+            </DockPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Focusable="False">
+            <StackPanel Margin="0,0,14,0">
+
+                <Label Target="{Binding ElementName=NameBox}" Content="Category _name" />
+                <TextBox x:Name="NameBox" Margin="0,0,0,4"
+                         automation:AutomationProperties.Name="Category name, required"
+                         automation:AutomationProperties.HelpText="What this kind of record is called, for example Invoice, Worker or Order. Use the singular." />
+                <TextBlock Text="Use the singular, as in Invoice rather than Invoices. The application writes sentences like New invoice from it."
+                           Style="{StaticResource FieldHelpText}"
+                           Margin="0,0,0,18" />
+
+                <Label Target="{Binding ElementName=TitleLabelBox}" Content="Name of the _identifying field" />
+                <TextBox x:Name="TitleLabelBox" Margin="0,0,0,4"
+                         automation:AutomationProperties.Name="Name of the identifying field"
+                         automation:AutomationProperties.HelpText="Every record needs one required field that names it. Type what this category should call that field, for example Item, Worker name or Customer name. Leave it empty to call it Title." />
+                <TextBlock Text="Every record needs one required field that names it, shown in the list and searched first. For example Item, Worker name or Customer name. Leave empty to call it Title."
+                           Style="{StaticResource FieldHelpText}"
+                           Margin="0,0,0,18" />
+
+                <Label Target="{Binding ElementName=DescriptionBox}" Content="_Description" />
+                <TextBox x:Name="DescriptionBox"
+                         AcceptsReturn="True" TextWrapping="Wrap"
+                         MinLines="2" MaxLines="3"
+                         VerticalContentAlignment="Top"
+                         Margin="0,0,0,4"
+                         automation:AutomationProperties.Name="Description"
+                         automation:AutomationProperties.HelpText="Optional. A sentence saying what belongs in this category." />
+                <TextBlock Text="Optional. A sentence saying what belongs in this category."
+                           Style="{StaticResource FieldHelpText}"
+                           Margin="0,0,0,18" />
+
+                <Label Target="{Binding ElementName=CopyFromBox}" Content="Start from an existing _category" />
+                <ComboBox x:Name="CopyFromBox" Margin="0,0,0,4"
+                          automation:AutomationProperties.Name="Start from an existing category"
+                          automation:AutomationProperties.HelpText="Use the up and down arrow keys. Copies that category's fields as a starting point, which you can then change. The original is not touched." />
+                <TextBlock x:Name="CopyHintText"
+                           Style="{StaticResource FieldHelpText}"
+                           automation:AutomationProperties.LiveSetting="Polite" />
+
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

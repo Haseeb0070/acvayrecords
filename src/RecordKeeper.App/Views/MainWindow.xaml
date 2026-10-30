@@ -1,0 +1,914 @@
+﻿<Window x:Class="RecordKeeper.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:app="clr-namespace:RecordKeeper.App"
+        xmlns:automation="clr-namespace:System.Windows.Automation;assembly=PresentationCore"
+        Title="acvayrecords"
+        MinWidth="820" MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        FontSize="{DynamicResource App.FontSize}"
+        Background="{DynamicResource App.Background}"
+        Foreground="{DynamicResource App.Foreground}"
+        UseLayoutRounding="True"
+        TextOptions.TextFormattingMode="Ideal">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisible" />
+        <app:NotEmptyToVisibilityConverter x:Key="NotEmptyToVisible" />
+        <app:InverseBooleanToVisibilityConverter x:Key="BoolToCollapsed" />
+        <app:WidthToColumnsConverter x:Key="WidthToColumns" />
+
+        <!-- Rows carry their spoken sentence on the list item itself. -->
+        <Style x:Key="RecordItemStyle" TargetType="ListBoxItem"
+               BasedOn="{StaticResource {x:Type ListBoxItem}}">
+            <Setter Property="automation:AutomationProperties.Name" Value="{Binding AccessibleName}" />
+        </Style>
+
+        <Style x:Key="NavItemStyle" TargetType="ListBoxItem"
+               BasedOn="{StaticResource {x:Type ListBoxItem}}">
+            <Setter Property="automation:AutomationProperties.Name" Value="{Binding AccessibleName}" />
+        </Style>
+
+        <!--
+            One row of the record list in list view. The three text styles recolour
+            themselves when the row is selected, so the blue secondary text never ends
+            up sitting on the blue selection block.
+        -->
+        <DataTemplate x:Key="RecordRowTemplate">
+            <StackPanel>
+                <TextBlock Text="{Binding Title}" Style="{StaticResource RowPrimaryText}" />
+                <TextBlock Text="{Binding SummaryLine}"
+                           Style="{StaticResource RowSecondaryText}"
+                           Visibility="{Binding SummaryLine, Converter={StaticResource NotEmptyToVisible}}"
+                           Margin="0,3,0,0" />
+                <TextBlock Text="{Binding BadgeLine}"
+                           Style="{StaticResource RowSecondaryText}"
+                           Visibility="{Binding BadgeLine, Converter={StaticResource NotEmptyToVisible}}"
+                           Margin="0,3,0,0" />
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- One entry in the left navigation list. -->
+        <!--
+            A group heading, or a category stepped in underneath one. The two name
+            styles differ so a group can be told from a category by eye; a screen
+            reader is told outright, since it reads "Group Online trading, ...".
+        -->
+        <DataTemplate x:Key="NavigationRowTemplate">
+            <Grid Margin="{Binding IndentMargin}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="{Binding Name}"
+                               Style="{StaticResource RowAccentText}"
+                               Visibility="{Binding IsGroup, Converter={StaticResource BoolToVisible}}" />
+                    <TextBlock Text="{Binding Name}"
+                               Style="{StaticResource RowPrimaryText}"
+                               Visibility="{Binding IsGroup, Converter={StaticResource BoolToCollapsed}}" />
+
+                    <TextBlock Text="{Binding ExpenseLabel}"
+                               Style="{StaticResource RowSecondaryText}"
+                               Visibility="{Binding HasExpenseTotal, Converter={StaticResource BoolToVisible}}"
+                               Margin="0,2,0,0" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="1" Text="{Binding CountLabel}"
+                           Style="{StaticResource RowAccentText}"
+                           VerticalAlignment="Top"
+                           Margin="12,0,0,0" />
+            </Grid>
+        </DataTemplate>
+
+        <!--
+            One editable field. All four input controls are declared and three are
+            collapsed; a collapsed control is outside the tab order and outside the
+            automation tree, so this costs nothing in keyboard or screen-reader terms
+            and avoids a template selector.
+        -->
+        <DataTemplate x:Key="FieldEditorTemplate">
+            <!-- Right margin is the gutter between the two columns. -->
+            <StackPanel Margin="0,0,28,14">
+                <TextBlock Style="{StaticResource InfoText}" Margin="0,0,0,4">
+                    <Run Text="{Binding Label, Mode=OneWay}" FontWeight="SemiBold" />
+                    <Run Text=" " />
+                    <Run Text="{Binding RequiredMarker, Mode=OneWay}"
+                         Foreground="{DynamicResource App.RequiredForeground}"
+                         FontStyle="Italic" />
+                </TextBlock>
+
+                <TextBlock Text="{Binding VisibleHelp}"
+                           Style="{StaticResource FieldHelpText}"
+                           Visibility="{Binding VisibleHelp, Converter={StaticResource NotEmptyToVisible}}"
+                           Margin="0,0,0,6" />
+
+                <!--
+                    The input sits in a star column capped at the width its kind of value
+                    deserves, with an empty column taking the slack. A plain MaxWidth
+                    cannot do this: left-aligned, the control shrinks to its minimum;
+                    stretched, WPF centres it. A capped column fills and stays left.
+                -->
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MaxWidth="{Binding InputMaxWidth}" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Grid.Column="0"
+                             Text="{Binding TextValue, UpdateSourceTrigger=PropertyChanged}"
+                             Visibility="{Binding IsPlainText, Converter={StaticResource BoolToVisible}}"
+                             automation:AutomationProperties.Name="{Binding AccessibleName}"
+                             automation:AutomationProperties.HelpText="{Binding AccessibleHelp}"
+                             Tag="FieldInput" />
+
+                    <!-- Long text earns the whole width. -->
+                    <TextBox Grid.Column="0" Grid.ColumnSpan="2"
+                             Text="{Binding TextValue, UpdateSourceTrigger=PropertyChanged}"
+                             Visibility="{Binding IsLongText, Converter={StaticResource BoolToVisible}}"
+                             AcceptsReturn="True" TextWrapping="Wrap"
+                             MinLines="4" MaxLines="12"
+                             VerticalScrollBarVisibility="Auto"
+                             VerticalContentAlignment="Top"
+                             automation:AutomationProperties.Name="{Binding AccessibleName}"
+                             automation:AutomationProperties.HelpText="{Binding AccessibleHelp}"
+                             Tag="FieldInput" />
+
+                    <ComboBox Grid.Column="0"
+                              ItemsSource="{Binding Choices}"
+                              SelectedItem="{Binding SelectedChoice}"
+                              Visibility="{Binding IsChoice, Converter={StaticResource BoolToVisible}}"
+                              automation:AutomationProperties.Name="{Binding AccessibleName}"
+                              automation:AutomationProperties.HelpText="{Binding AccessibleHelp}"
+                              Tag="FieldInput" />
+
+                    <CheckBox Grid.Column="0"
+                              IsChecked="{Binding BoolValue}"
+                              Content="Yes"
+                              Visibility="{Binding IsBoolean, Converter={StaticResource BoolToVisible}}"
+                              automation:AutomationProperties.Name="{Binding AccessibleName}"
+                              automation:AutomationProperties.HelpText="{Binding AccessibleHelp}"
+                              Tag="FieldInput" />
+
+                    <!--
+                        A worked-out field. Read-only, but still a focusable text box rather
+                        than a label, so the keyboard can land on it and the screen reader can
+                        read it back and caret through the digits.
+                    -->
+                    <TextBox Grid.Column="0"
+                             Text="{Binding ComputedText, Mode=OneWay}"
+                             Visibility="{Binding IsCalculated, Converter={StaticResource BoolToVisible}}"
+                             IsReadOnly="True"
+                             IsReadOnlyCaretVisible="True"
+                             FontWeight="SemiBold"
+                             automation:AutomationProperties.Name="{Binding AccessibleName}"
+                             automation:AutomationProperties.HelpText="{Binding AccessibleHelp}"
+                             Tag="FieldInput" />
+                </Grid>
+
+                <TextBlock Text="{Binding ComputedProblem}"
+                           Style="{StaticResource FieldHelpText}"
+                           Visibility="{Binding HasComputedProblem, Converter={StaticResource BoolToVisible}}"
+                           Margin="0,6,0,0" />
+
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Style="{StaticResource ErrorText}"
+                           Visibility="{Binding HasError, Converter={StaticResource BoolToVisible}}"
+                           Margin="0,6,0,0" />
+            </StackPanel>
+        </DataTemplate>
+
+        <!-- One attached file. -->
+        <DataTemplate x:Key="AttachmentRowTemplate">
+            <StackPanel>
+                <TextBlock Text="{Binding FileName}" Style="{StaticResource RowPrimaryText}" />
+                <TextBlock Text="{Binding SizeSpoken}" Style="{StaticResource RowSecondaryText}" />
+                <TextBlock Text="{Binding Description}"
+                           Style="{StaticResource RowSecondaryText}"
+                           Visibility="{Binding Description, Converter={StaticResource NotEmptyToVisible}}" />
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+    <DockPanel>
+
+        <!--
+            =================== Brand bar ===================
+
+            The same lock-up that appears on the startup screen and at the top of every
+            PDF, so the three agree with each other.
+
+            Its sizes are fixed rather than scaled from the user's text size. The logo
+            is identity, not content: letting it grow to 48 point along with the records
+            would eat the window and give nothing back.
+        -->
+        <Border DockPanel.Dock="Top" Style="{StaticResource Brand.HeaderBar}">
+            <DockPanel LastChildFill="False">
+                <Image DockPanel.Dock="Left"
+                       Source="{StaticResource Brand.LogoMark}"
+                       Width="30" Height="30"
+                       VerticalAlignment="Center"
+                       automation:AutomationProperties.Name="acvaysoft" />
+
+                <TextBlock DockPanel.Dock="Left"
+                           Margin="11,0,0,0"
+                           VerticalAlignment="Center"
+                           FontSize="18"
+                           TextWrapping="NoWrap"><!--
+                    The two runs must touch with no whitespace between the tags, or XAML
+                    renders the wordmark as "acvay soft".
+                --><Run Text="acvay" FontWeight="Bold" Foreground="{DynamicResource Brand.DeepBlue}" /><Run Text="soft" FontWeight="Light" Foreground="{DynamicResource Brand.MidBlue}" /></TextBlock>
+
+                <!--
+                    The menu lives in the brand bar rather than in a strip of its own.
+                    Two stacked bands before any content is a lot of chrome for a window
+                    whose job is to show records, and Alt reaches the menu wherever it sits.
+                -->
+                <Menu x:Name="MainMenu"
+                      DockPanel.Dock="Left"
+                      Margin="26,0,0,0"
+                      VerticalAlignment="Center"
+                      Background="Transparent"
+                      automation:AutomationProperties.Name="Main menu">
+            <MenuItem Header="_File">
+                <MenuItem x:Name="MenuNewRecord" Header="_New record" InputGestureText="Ctrl+N"
+                          IsEnabled="{Binding CanAddRecord}"
+                          ToolTip="{Binding NewRecordHelpText}" />
+                <Separator />
+                <MenuItem x:Name="MenuExportPdfList" Header="Export list to _PDF" InputGestureText="Ctrl+E" />
+                <MenuItem x:Name="MenuExportPdfDetails" Header="Export full _details to PDF" />
+                <MenuItem x:Name="MenuExportText" Header="Export to plain _text" InputGestureText="Ctrl+T" />
+                <MenuItem x:Name="MenuExportCsv" Header="Export to _CSV for a spreadsheet" />
+                <Separator />
+                <MenuItem x:Name="MenuBackup" Header="_Back up now" InputGestureText="Ctrl+B" />
+                <MenuItem x:Name="MenuOpenDataFolder" Header="Open data _folder" />
+                <Separator />
+                <MenuItem x:Name="MenuExit" Header="E_xit" InputGestureText="Alt+F4" />
+            </MenuItem>
+
+            <MenuItem Header="_Record">
+                <MenuItem x:Name="MenuEditRecord" Header="_Open record" InputGestureText="Enter" />
+                <MenuItem x:Name="MenuToggleFavorite" Header="Mark as _favourite" InputGestureText="Ctrl+D" />
+                <Separator />
+                <MenuItem x:Name="MenuDelete" Header="Move to recycle _bin" InputGestureText="Delete" />
+                <MenuItem x:Name="MenuRestore" Header="_Restore from recycle bin" InputGestureText="Ctrl+R" />
+                <MenuItem x:Name="MenuPurge" Header="Delete _permanently" InputGestureText="Shift+Delete" />
+                <MenuItem x:Name="MenuEmptyBin" Header="_Empty the recycle bin" />
+            </MenuItem>
+
+            <MenuItem Header="_View">
+                <MenuItem x:Name="MenuToggleView" Header="Switch between list and _table"
+                          InputGestureText="Ctrl+Shift+V" />
+                <MenuItem x:Name="MenuToggleSort" Header="Sorting and _period controls" />
+                <MenuItem x:Name="MenuToggleTotals" Header="T_otals under the list" />
+                <MenuItem x:Name="MenuFocusSearch" Header="_Search" InputGestureText="Ctrl+F" />
+                <MenuItem x:Name="MenuClearSearch" Header="_Clear the search" InputGestureText="Ctrl+Shift+C" />
+                <Separator />
+                <MenuItem x:Name="MenuFontBigger" Header="Make text _bigger" InputGestureText="Ctrl+Plus" />
+                <MenuItem x:Name="MenuFontSmaller" Header="Make text _smaller" InputGestureText="Ctrl+Minus" />
+                <MenuItem x:Name="MenuFontReset" Header="_Reset text size" InputGestureText="Ctrl+0" />
+                <Separator />
+                <MenuItem x:Name="MenuToggleNav" Header="Show or hide the category _list" InputGestureText="Ctrl+L" />
+                <MenuItem x:Name="MenuWhereAmI" Header="Say _where I am" InputGestureText="Ctrl+Shift+W" />
+                <MenuItem x:Name="MenuRefresh" Header="Re_fresh" InputGestureText="F5" />
+            </MenuItem>
+
+            <MenuItem Header="_Tools">
+                <MenuItem x:Name="MenuNewCategory" Header="_New category" InputGestureText="Ctrl+Shift+N" />
+                <MenuItem x:Name="MenuManageTypes" Header="Categories and their _fields" InputGestureText="Ctrl+Shift+T" />
+                <MenuItem x:Name="MenuRecalculate" Header="Work out every total _again"
+                          ToolTip="Re-applies the formulas to records that were saved before a formula was changed." />
+                <Separator />
+                <MenuItem x:Name="MenuCommandPalette" Header="_Find a command" InputGestureText="Ctrl+K" />
+                <MenuItem x:Name="MenuSettings" Header="_Settings" InputGestureText="Ctrl+Comma" />
+            </MenuItem>
+
+            <MenuItem Header="_Help">
+                <MenuItem x:Name="MenuShortcuts" Header="_Keyboard shortcuts" InputGestureText="F1" />
+                    <MenuItem x:Name="MenuAbout" Header="_About acvayrecords" />
+                </MenuItem>
+                </Menu>
+            </DockPanel>
+        </Border>
+
+        <!-- =================== Status bar: the live region =================== -->
+        <StatusBar DockPanel.Dock="Bottom"
+                   automation:AutomationProperties.Name="Status">
+            <StatusBarItem>
+                <!--
+                    Narrator reads this when it changes, without focus moving.
+                    Nothing here ever auto-clears: a user who missed the message can
+                    reach it with F6 and read it at their own pace.
+                -->
+                <!--
+                    One line, trimmed rather than wrapped. A long message used to grow
+                    the bar upwards and take that space off the record list; the whole
+                    message is still read aloud, and is still here to be read at leisure.
+                -->
+                <TextBlock x:Name="StatusText"
+                           Text="Ready"
+                           Focusable="True"
+                           TextWrapping="NoWrap"
+                           TextTrimming="CharacterEllipsis"
+                           ToolTip="{Binding Text, RelativeSource={RelativeSource Self}}"
+                           automation:AutomationProperties.Name="Status"
+                           automation:AutomationProperties.LiveSetting="Polite" />
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock x:Name="PositionText"
+                           TextWrapping="NoWrap"
+                           Foreground="{DynamicResource App.SubtleForeground}"
+                           automation:AutomationProperties.Name="Position in list" />
+            </StatusBarItem>
+        </StatusBar>
+
+        <!-- =================== Body =================== -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition x:Name="NavColumn" Width="220" MinWidth="170" />
+                <ColumnDefinition x:Name="SplitterColumn" Width="4" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Navigation pane -->
+            <DockPanel x:Name="NavPane" Grid.Column="0" Margin="20,20,0,20">
+                <TextBlock DockPanel.Dock="Top" Text="Categories"
+                           Style="{StaticResource HeadingText}" />
+                <!-- Top-aligned, so it does not draw an empty box down to the floor. -->
+                <ListBox x:Name="NavList"
+                         Style="{StaticResource PlainList}"
+                         VerticalAlignment="Top"
+                         ItemsSource="{Binding NavigationItems}"
+                         SelectedItem="{Binding SelectedNavigation}"
+                         ItemTemplate="{StaticResource NavigationRowTemplate}"
+                         ItemContainerStyle="{StaticResource NavItemStyle}"
+                         automation:AutomationProperties.Name="Categories. Use the up and down arrow keys, or Alt plus a number." />
+            </DockPanel>
+
+            <GridSplitter x:Name="NavSplitter"
+                          Grid.Column="1" Width="4" HorizontalAlignment="Stretch"
+                          Background="{DynamicResource App.Border}"
+                          automation:AutomationProperties.Name="Resize the category list" />
+
+            <Grid Grid.Column="2" Margin="20">
+
+                <!-- ================= List page ================= -->
+                <DockPanel x:Name="ListPage"
+                           Visibility="{Binding IsListVisible, Converter={StaticResource BoolToVisible}}">
+
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+
+                        <!--
+                            The heading sits left, the view switch sits right on the same
+                            line. It belongs with the page rather than in the row of
+                            record actions: it changes how the whole list is presented,
+                            it does not act on a record.
+                        -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{Binding ListHeading}"
+                                           Style="{StaticResource PageHeading}"
+                                           automation:AutomationProperties.HeadingLevel="Level1" />
+
+                                <Border Style="{StaticResource Brand.AccentRule}" />
+                            </StackPanel>
+
+                            <!--
+                                The three things that change what the page shows, kept
+                                together in one corner. Each says what pressing it will
+                                do, and each remembers its answer for next time.
+                            -->
+                            <StackPanel Grid.Column="1" Orientation="Horizontal"
+                                        VerticalAlignment="Top"
+                                        Margin="16,0,0,0">
+                                <Button x:Name="ToggleSortButton"
+                                        Content="{Binding SortToggleLabel}"
+                                        MinWidth="195"
+                                        Margin="0,0,10,0"
+                                        automation:AutomationProperties.Name="{Binding SortToggleLabel}"
+                                        automation:AutomationProperties.HelpText="{Binding SortToggleHelp}" />
+
+                                <Button x:Name="ToggleTotalsButton"
+                                        Content="{Binding TotalsToggleLabel}"
+                                        MinWidth="130"
+                                        Margin="0,0,10,0"
+                                        automation:AutomationProperties.Name="{Binding TotalsToggleLabel}"
+                                        automation:AutomationProperties.HelpText="{Binding TotalsToggleHelp}" />
+
+                                <Button x:Name="ToggleViewButton"
+                                        Content="{Binding ViewToggleLabel}"
+                                        MinWidth="124"
+                                        Margin="0"
+                                        automation:AutomationProperties.Name="{Binding ViewToggleLabel}"
+                                        automation:AutomationProperties.HelpText="{Binding ViewToggleHelp}" />
+                            </StackPanel>
+                        </Grid>
+
+                        <TextBlock Text="{Binding ListCountLine}"
+                                   Style="{StaticResource InfoText}"
+                                   Margin="0,12,0,16" />
+
+                        <Grid>
+                            <!-- The search box is capped and the buttons sit next to it,
+                                 rather than the box spanning the window with the buttons
+                                 stranded on the far side. -->
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" MaxWidth="460" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--
+                                The box and the buttons share row 1 and both stretch to
+                                fill it, so they are the same height by construction.
+                                Giving them matching heights by hand only holds until the
+                                text size changes, and a text box is naturally taller than
+                                a button at the same font.
+                            -->
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   Target="{Binding ElementName=SearchBox}" Content="_Search" />
+
+                            <TextBox x:Name="SearchBox" Grid.Row="1" Grid.Column="0"
+                                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged, Delay=250}"
+                                     automation:AutomationProperties.Name="Search"
+                                     automation:AutomationProperties.HelpText="Type any part of a title, a field value, a note or a tag. Results narrow as you type. Press Escape to clear." />
+
+                            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal"
+                                        Margin="14,0,0,0">
+                                <!--
+                                    Both buttons are hidden when they could not work:
+                                    there is no new record to add on Favourites or in the
+                                    recycle bin, and nothing to open when nothing is
+                                    selected. A button that only explains why it did
+                                    nothing is still a button that did nothing, and it
+                                    would sit in the keyboard tab order making a promise.
+                                -->
+                                <Button x:Name="NewRecordButton" Content="_New record"
+                                        Style="{StaticResource PrimaryButton}"
+                                        Visibility="{Binding CanAddRecord, Converter={StaticResource BoolToVisible}}"
+                                        ToolTip="{Binding NewRecordHelpText}"
+                                        automation:AutomationProperties.HelpText="{Binding NewRecordHelpText}" />
+                                <Button x:Name="OpenRecordButton" Content="_Open"
+                                        Margin="0"
+                                        Visibility="{Binding HasSelection, Converter={StaticResource BoolToVisible}}"
+                                        automation:AutomationProperties.HelpText="Opens the selected record for editing. Shortcut Enter." />
+                            </StackPanel>
+                        </Grid>
+
+                        <!--
+                            Shown or hidden by the Sort and period button. The order and
+                            the period stay in force either way; only the controls are
+                            put away, which is why the line saying what the period is
+                            stays outside this panel.
+                        -->
+                        <StackPanel Visibility="{Binding ShowSortControls, Converter={StaticResource BoolToVisible}}">
+                        <!--
+                            Sorting and the period, laid out like the search box above:
+                            label in row 0, control in row 1, so the whole strip reads
+                            as one row instead of a scattering of boxes.
+                        -->
+                        <Grid Margin="0,14,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   Target="{Binding ElementName=SortByBox}" Content="S_ort by" />
+                            <ComboBox x:Name="SortByBox" Grid.Row="1" Grid.Column="0"
+                                      MinWidth="200"
+                                      ItemsSource="{Binding SortOptions}"
+                                      SelectedItem="{Binding SelectedSort}"
+                                      DisplayMemberPath="Name"
+                                      automation:AutomationProperties.Name="Sort by"
+                                      automation:AutomationProperties.HelpText="Chooses which column the list is ordered by, including your own fields." />
+
+                            <Label Grid.Row="0" Grid.Column="1" Content="Order" Margin="12,0,0,0" />
+                            <!--
+                                The button shows the order the list is in now, not the
+                                order pressing it would give; what it would do is in its
+                                help text. A control that reads as the opposite of what
+                                is on screen cannot be trusted without looking.
+                            -->
+                            <Button x:Name="SortOrderButton" Grid.Row="1" Grid.Column="1"
+                                    Content="{Binding SortOrderLabel}"
+                                    MinWidth="160" Margin="12,0,0,0"
+                                    automation:AutomationProperties.HelpText="{Binding SortOrderHelp}" />
+
+                            <Label Grid.Row="0" Grid.Column="2" Margin="24,0,0,0"
+                                   Target="{Binding ElementName=PeriodBox}" Content="S_how" />
+                            <ComboBox x:Name="PeriodBox" Grid.Row="1" Grid.Column="2"
+                                      MinWidth="180" Margin="24,0,0,0"
+                                      ItemsSource="{Binding PeriodOptions}"
+                                      SelectedItem="{Binding SelectedPeriod}"
+                                      DisplayMemberPath="Name"
+                                      automation:AutomationProperties.Name="Show which dates"
+                                      automation:AutomationProperties.HelpText="Narrows the list, and the totals under it, to records within a period." />
+
+                            <Label Grid.Row="0" Grid.Column="3" Margin="24,0,0,0"
+                                   Target="{Binding ElementName=DateFieldBox}" Content="_By date"
+                                   Visibility="{Binding ShowDateFieldChoice, Converter={StaticResource BoolToVisible}}" />
+                            <ComboBox x:Name="DateFieldBox" Grid.Row="1" Grid.Column="3"
+                                      MinWidth="180" Margin="24,0,0,0"
+                                      ItemsSource="{Binding DateFieldOptions}"
+                                      SelectedItem="{Binding SelectedDateField}"
+                                      DisplayMemberPath="Name"
+                                      Visibility="{Binding ShowDateFieldChoice, Converter={StaticResource BoolToVisible}}"
+                                      automation:AutomationProperties.Name="Which date the period uses"
+                                      automation:AutomationProperties.HelpText="This category has more than one date, so this chooses which one the period is measured against." />
+                        </Grid>
+
+                        <!-- The two boxes appear only when a custom range is chosen. -->
+                        <Grid Margin="0,12,0,0"
+                              Visibility="{Binding ShowCustomDates, Converter={StaticResource BoolToVisible}}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Label Grid.Row="0" Grid.Column="0"
+                                   Target="{Binding ElementName=FromDateBox}" Content="Fro_m" />
+                            <TextBox x:Name="FromDateBox" Grid.Row="1" Grid.Column="0" MinWidth="200"
+                                     automation:AutomationProperties.Name="From date"
+                                     automation:AutomationProperties.HelpText="Type a date, or the word today or yesterday. Leave it empty for no start date. Press Enter to apply it." />
+
+                            <Label Grid.Row="0" Grid.Column="1" Margin="14,0,0,0"
+                                   Target="{Binding ElementName=ToDateBox}" Content="_To" />
+                            <TextBox x:Name="ToDateBox" Grid.Row="1" Grid.Column="1" MinWidth="200" Margin="14,0,0,0"
+                                     automation:AutomationProperties.Name="To date"
+                                     automation:AutomationProperties.HelpText="Type a date, or the word today. The whole of that day is included. Leave it empty for no end date. Press Enter to apply it." />
+                        </Grid>
+                        </StackPanel>
+
+                        <!-- Only worth a line when a period is actually narrowing the list. -->
+                        <TextBlock Text="{Binding PeriodDescription}"
+                                   Style="{StaticResource InfoText}"
+                                   Visibility="{Binding ShowPeriodDescription, Converter={StaticResource BoolToVisible}}"
+                                   Margin="0,10,0,0" />
+
+                        <!-- Said once, quietly, when nothing here is set to be added up. -->
+                        <TextBlock Text="{Binding TotalsHint}"
+                                   Style="{StaticResource InfoText}"
+                                   TextWrapping="Wrap"
+                                   Visibility="{Binding ShowTotalsHint, Converter={StaticResource BoolToVisible}}"
+                                   Margin="0,10,0,0" />
+
+                        <!--
+                            What the listed records add up to. Above the list rather than
+                            under it, so the answer is heard before the records that make
+                            it up, and so it does not move as the list grows.
+                        -->
+                        <Border Style="{StaticResource Card}"
+                                Margin="0,16,0,0"
+                                Visibility="{Binding TotalsPanelVisible, Converter={StaticResource BoolToVisible}}"
+                                automation:AutomationProperties.Name="{Binding TotalsSpoken}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding TotalsHeading}"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource App.HeadingForeground}"
+                                           automation:AutomationProperties.HeadingLevel="Level2" />
+
+                                <ItemsControl ItemsSource="{Binding Totals}" Margin="0,6,0,0"
+                                              automation:AutomationProperties.Name="Totals">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,5,0,0">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" MinWidth="240" />
+                                                    <ColumnDefinition Width="Auto" MinWidth="160" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock Grid.Column="0" Text="{Binding FieldName}"
+                                                           Style="{StaticResource RowSecondaryText}"
+                                                           VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="1" Text="{Binding Amount}"
+                                                           Style="{StaticResource RowPrimaryText}"
+                                                           VerticalAlignment="Center" />
+                                                <TextBlock Grid.Column="2" Text="{Binding Coverage}"
+                                                           Style="{StaticResource FieldHelpText}"
+                                                           Margin="12,0,0,0"
+                                                           VerticalAlignment="Center" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                        <!--
+                            The group's running expense total. The fields it is made of
+                            are named underneath, because a total nobody can check is a
+                            total nobody can trust.
+                        -->
+                        <Border Style="{StaticResource Card}"
+                                Margin="0,16,0,0"
+                                Visibility="{Binding ShowGroupSummary, Converter={StaticResource BoolToVisible}}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding GroupExpenseHeadline}"
+                                           Style="{StaticResource PageHeading}"
+                                           automation:AutomationProperties.HeadingLevel="Level2" />
+                                <TextBlock Text="{Binding GroupExpenseDetail}"
+                                           Style="{StaticResource FieldHelpText}"
+                                           Visibility="{Binding GroupExpenseDetail, Converter={StaticResource NotEmptyToVisible}}"
+                                           Margin="0,8,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+
+                    <!--
+                        The list, the table and the empty-state panel occupy the same
+                        space, one at a time. They are siblings in a Grid rather than in
+                        the DockPanel, because a DockPanel only stretches its last child
+                        and that would leave whichever one is showing at its natural width.
+                    -->
+                    <Grid>
+                        <!-- List view: one accessible item per record. -->
+                        <ListBox x:Name="RecordList"
+                                 Style="{StaticResource PlainList}"
+                                 Visibility="{Binding ShowListView, Converter={StaticResource BoolToVisible}}"
+                                 ItemsSource="{Binding Records}"
+                                 SelectedItem="{Binding SelectedRecord}"
+                                 ItemTemplate="{StaticResource RecordRowTemplate}"
+                                 ItemContainerStyle="{StaticResource RecordItemStyle}"
+                                 SelectionMode="Extended"
+                                 automation:AutomationProperties.Name="Records"
+                                 automation:AutomationProperties.HelpText="Use the up and down arrow keys to move through the records. Press Enter to open one, Delete to move it to the recycle bin." />
+
+                        <!--
+                            Table view: columns are rebuilt in code when the category
+                            changes. Wrapped in a rounded border so the table sits in the
+                            same kind of container as everything else; the grid itself
+                            draws no border of its own.
+                        -->
+                        <Border Visibility="{Binding ShowTableView, Converter={StaticResource BoolToVisible}}"
+                                CornerRadius="{StaticResource App.CornerRadius.Large}"
+                                BorderBrush="{DynamicResource App.Border}"
+                                BorderThickness="1"
+                                Padding="1">
+                            <DataGrid x:Name="RecordGrid"
+                                      ItemsSource="{Binding Records}"
+                                      SelectedItem="{Binding SelectedRecord}"
+                                      automation:AutomationProperties.Name="Records table"
+                                      automation:AutomationProperties.HelpText="Use the arrow keys to move between cells. Press Enter to open the selected record." />
+                        </Border>
+
+                        <!--
+                            Shown instead of an empty list. An empty box with no
+                            explanation is the least helpful thing to hand a new user.
+                        -->
+                        <Border Style="{StaticResource Card}"
+                                VerticalAlignment="Top"
+                                Visibility="{Binding IsEmptyList, Converter={StaticResource BoolToVisible}}">
+                            <StackPanel>
+                                <TextBlock Text="{Binding EmptyStateHeading}"
+                                           Style="{StaticResource PageHeading}"
+                                           automation:AutomationProperties.HeadingLevel="Level2" />
+                                <TextBlock Text="{Binding EmptyStateHint}"
+                                           Style="{StaticResource InfoText}"
+                                           Margin="0,8,0,0" />
+                                <Button x:Name="EmptyStateNewButton"
+                                        Content="_Add the first record"
+                                        Style="{StaticResource PrimaryButton}"
+                                        HorizontalAlignment="Left"
+                                        MinWidth="220"
+                                        Margin="0,18,0,0"
+                                        Visibility="{Binding CanAddRecord, Converter={StaticResource BoolToVisible}}"
+                                        automation:AutomationProperties.HelpText="{Binding NewRecordHelpText}" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </DockPanel>
+
+                <!-- ================= Editor page ================= -->
+                <!--
+                    This panel re-points its DataContext at the open editor, so its own
+                    Visibility has to reach back past that to the window's view model.
+                -->
+                <DockPanel x:Name="EditorPage"
+                           Visibility="{Binding DataContext.IsEditing, RelativeSource={RelativeSource AncestorType=Window}, Converter={StaticResource BoolToVisible}}"
+                           DataContext="{Binding Editor}">
+
+                    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
+                        <TextBlock Text="{Binding HeadingText}"
+                                   Style="{StaticResource PageHeading}"
+                                   automation:AutomationProperties.HeadingLevel="Level1" />
+
+                        <Border Style="{StaticResource Brand.AccentRule}" />
+
+                        <TextBlock Text="Press Control plus S to save, or Escape to go back without saving."
+                                   Style="{StaticResource InfoText}"
+                                   Margin="0,12,0,0" />
+                    </StackPanel>
+
+                    <!--
+                        The action bar, separated from the form by a rule.
+
+                        Moving to the recycle bin sits at the far end, away from Save.
+                        A destructive action next to the primary one is how people
+                        delete records they meant to keep.
+                    -->
+                    <Border DockPanel.Dock="Bottom"
+                            BorderBrush="{DynamicResource App.Border}"
+                            BorderThickness="0,1,0,0"
+                            Margin="0,16,0,0"
+                            Padding="0,14,0,0">
+                        <DockPanel LastChildFill="False">
+                            <Button x:Name="SaveButton" Content="_Save"
+                                    DockPanel.Dock="Left"
+                                    Style="{StaticResource PrimaryButton}"
+                                    MinWidth="130"
+                                    automation:AutomationProperties.HelpText="Saves this record. Shortcut Control plus S." />
+                            <Button x:Name="CancelButton" Content="_Cancel"
+                                    DockPanel.Dock="Left"
+                                    automation:AutomationProperties.HelpText="Goes back to the list without saving. Shortcut Escape." />
+                            <Button x:Name="DeleteFromEditorButton" Content="Move to recycle _bin"
+                                    DockPanel.Dock="Right"
+                                    MinWidth="180"
+                                    Margin="0"
+                                    automation:AutomationProperties.HelpText="Moves this record to the recycle bin, where it can be restored." />
+                        </DockPanel>
+                    </Border>
+
+                    <!--
+                        The width cap sits outside the scroller, not inside it. Capping
+                        the content alone left the scroll bar pinned to the far edge of
+                        the window, a long way from the form it scrolls.
+
+                        Capped and left aligned because a form stretched across a wide
+                        monitor makes every line a long eye-journey from label to field.
+                    -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" MaxWidth="1500" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                    <ScrollViewer Grid.Column="0"
+                                  VerticalScrollBarVisibility="Auto"
+                                  Focusable="False"
+                                  automation:AutomationProperties.Name="Record fields">
+                        <StackPanel Margin="0,0,14,0">
+
+                            <GroupBox Header="{Binding DetailsHeading}">
+                              <StackPanel>
+
+                            <!-- Title -->
+                            <StackPanel Margin="0,0,0,18">
+                                <TextBlock Style="{StaticResource InfoText}" Margin="0,0,0,4">
+                                    <Run Text="{Binding TitleLabel, Mode=OneWay}" FontWeight="SemiBold" />
+                                    <Run Text=" " />
+                                    <Run Text="required"
+                                         Foreground="{DynamicResource App.RequiredForeground}"
+                                         FontStyle="Italic" />
+                                </TextBlock>
+                                <TextBlock Text="{Binding TitleHelp}"
+                                           Style="{StaticResource FieldHelpText}"
+                                           Margin="0,0,0,6" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" MaxWidth="560" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="TitleBox" Grid.Column="0"
+                                             Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
+                                             automation:AutomationProperties.Name="{Binding TitleAccessibleName}"
+                                             automation:AutomationProperties.HelpText="{Binding TitleHelpSpoken}" />
+                                </Grid>
+                                <TextBlock Text="{Binding TitleError}"
+                                           Style="{StaticResource ErrorText}"
+                                           Visibility="{Binding HasTitleError, Converter={StaticResource BoolToVisible}}"
+                                           Margin="0,6,0,0" />
+                            </StackPanel>
+
+                            <!--
+                                Custom fields, paired into two columns when there is room.
+                                Reading order is still left to right then down, so the tab
+                                order and what a screen reader announces both match what
+                                the eye does.
+                            -->
+                            <ItemsControl x:Name="FieldsHost"
+                                          ItemsSource="{Binding Fields}"
+                                          ItemTemplate="{StaticResource FieldEditorTemplate}"
+                                          Focusable="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="{Binding ActualWidth,
+                                                               RelativeSource={RelativeSource AncestorType=ItemsControl},
+                                                               Converter={StaticResource WidthToColumns}}" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+
+                              </StackPanel>
+                            </GroupBox>
+
+                            <!-- Named for everything it holds. It had a favourite toggle
+                                 in it while calling itself "Notes and tags". -->
+                            <GroupBox Header="Notes, tags and favourite">
+                              <StackPanel>
+
+                            <!-- Notes -->
+                            <StackPanel Margin="0,0,0,18">
+                                <TextBlock Text="Notes" Style="{StaticResource InfoText}"
+                                           FontWeight="SemiBold" Margin="0,0,0,4" />
+                                <TextBlock Text="Anything else worth remembering. Press Enter for a new line."
+                                           Style="{StaticResource FieldHelpText}"
+                                           Margin="0,0,0,6" />
+                                <TextBox Text="{Binding Notes, UpdateSourceTrigger=PropertyChanged}"
+                                         AcceptsReturn="True" TextWrapping="Wrap"
+                                         MinLines="3" MaxLines="10"
+                                         VerticalScrollBarVisibility="Auto"
+                                         VerticalContentAlignment="Top"
+                                         automation:AutomationProperties.Name="Notes"
+                                         automation:AutomationProperties.HelpText="Free text. Press Enter for a new line." />
+                            </StackPanel>
+
+                            <!-- Tags -->
+                            <StackPanel Margin="0,0,0,18">
+                                <TextBlock Text="Tags" Style="{StaticResource InfoText}"
+                                           FontWeight="SemiBold" Margin="0,0,0,4" />
+                                <TextBlock Text="Separate tags with commas. Tags let one record show up under several headings."
+                                           Style="{StaticResource FieldHelpText}"
+                                           Margin="0,0,0,6" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" MaxWidth="560" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding TagsText, UpdateSourceTrigger=PropertyChanged}"
+                                             automation:AutomationProperties.Name="Tags"
+                                             automation:AutomationProperties.HelpText="Separate tags with commas, for example: urgent, 2026, insurance." />
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- Favourite -->
+                            <CheckBox IsChecked="{Binding IsFavorite}"
+                                      Content="Mark this record as a favourite"
+                                      automation:AutomationProperties.Name="Mark this record as a favourite"
+                                      automation:AutomationProperties.HelpText="Favourites appear together under Favourites in the category list." />
+
+                              </StackPanel>
+                            </GroupBox>
+
+                            <!-- Attachments -->
+                            <GroupBox Header="{Binding AttachmentsHeading}">
+                                <StackPanel>
+                                    <TextBlock Text="Files are copied into the data folder, so moving or deleting the original will not break this record."
+                                               Style="{StaticResource FieldHelpText}"
+                                               Margin="0,0,0,8" />
+
+                                    <ListBox x:Name="AttachmentList"
+                                             ItemsSource="{Binding Attachments}"
+                                             ItemTemplate="{StaticResource AttachmentRowTemplate}"
+                                             MaxHeight="220"
+                                             Margin="0,0,0,10"
+                                             Visibility="{Binding HasAttachments, Converter={StaticResource BoolToVisible}}"
+                                             automation:AutomationProperties.Name="Attached files"
+                                             automation:AutomationProperties.HelpText="Use the arrow keys to move through the attached files." />
+
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button x:Name="AddAttachmentButton" Content="_Attach a file"
+                                                MinWidth="195"
+                                                automation:AutomationProperties.HelpText="Choose a file to copy into this record. Shortcut Control plus Shift plus A." />
+                                        <Button x:Name="OpenAttachmentButton" Content="O_pen file"
+                                                automation:AutomationProperties.HelpText="Opens the selected attached file in whichever program Windows uses for it." />
+                                        <Button x:Name="RemoveAttachmentButton" Content="Re_move file"
+                                                MinWidth="140"
+                                                automation:AutomationProperties.HelpText="Removes the selected file from this record and deletes the stored copy." />
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                    </Grid>
+                </DockPanel>
+            </Grid>
+        </Grid>
+    </DockPanel>
+</Window>
